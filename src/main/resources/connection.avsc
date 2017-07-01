@@ -1,0 +1,22 @@
+{
+	"type": "record",
+	"name": "Record",
+	"namespace": "com.comodo.csvtoparquet",
+	"fields": [{
+		"name": "src_ip",
+		"type": "long",
+		"default": 0
+	}, {
+		"name": "dst_ip",
+		"type": "long",
+		"default": 0
+	}, {
+		"name": "time",
+		"type": "long",
+		"default": 0
+	}, {
+		"name": "protocol",
+		"type": "int",
+		"default": -1
+	}]
+}
