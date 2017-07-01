@@ -1,5 +1,6 @@
 package com.gilmour.nea;
 
+import com.gilmour.nea.core.ProtocolNumberConverter;
 import com.gilmour.nea.resources.ParquetResource;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
@@ -25,6 +26,8 @@ public class NeaApplication extends Application<NeaConfiguration> {
     @Override
     public void run(final NeaConfiguration configuration,
                     final Environment environment) {
+
+        ProtocolNumberConverter.getInstance();
 
         // Enabling MultiPartFeature, injects necessary message body readers, writers for Jersey 2 application.
         environment.jersey().register(MultiPartFeature.class);
