@@ -1,9 +1,9 @@
 package com.gilmour.nea.service;
 
 import com.gilmour.nea.core.ConnectionDTO;
+import com.gilmour.nea.core.ConnectionSummaryDaoProxy;
 import com.gilmour.nea.core.ParquetDTO;
 import com.gilmour.nea.core.TimeUtility;
-import com.gilmour.nea.db.ConnectionSummaryDAO;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import org.apache.avro.generic.GenericRecord;
@@ -30,7 +30,7 @@ public class ParquetService {
 
     private static ParquetService instance = null;
 
-    private ConnectionSummaryDAO connectionSummaryDAO;
+    private ConnectionSummaryDaoProxy connectionSummaryDaoProxy;
 
     private ParquetService() {
     }
@@ -46,17 +46,27 @@ public class ParquetService {
         return instance;
     }
 
+    public void init(ConnectionSummaryDaoProxy connectionSummaryDaoProxy) {
+        this.connectionSummaryDaoProxy = connectionSummaryDaoProxy;
+    }
 
-    public void addParquetFile(ParquetDTO parquetDTO, boolean isPatch) {
+    public void addParquetFile(ParquetDTO parquetDTO, boolean isPost) {
 
         parquetExecutorService.execute(() -> {
             try {
+
+                if (isPost) {
+
+                    // clear up old ones.
+
+                } else {
+
+                    // get existing connections by id
+
+                }
+
                 Multiset<ConnectionDTO> connectionDTOList = parseParquetRecords(parquetDTO.getFilePath());
-
-                connectionDTOList.elementSet().forEach( e -> {
-                    System.err.println(connectionDTOList.count(e));
-                });
-
+                connectionSummaryDaoProxy.persistList(connectionDTOList, "test", parquetDTO.getUploadCode());
 
             } catch (IOException e) {
                 e.printStackTrace();

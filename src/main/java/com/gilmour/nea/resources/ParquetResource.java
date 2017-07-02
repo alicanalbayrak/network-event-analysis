@@ -55,7 +55,7 @@ public class ParquetResource {
             return Response.status(200).entity("put test").build();
         }
 
-        ParquetService.getInstance().addParquetFile(new ParquetDTO(fileUploadPath, fileDetail.getFileName(), uploadCode), false);
+        ParquetService.getInstance().addParquetFile(new ParquetDTO(fileUploadPath, fileDetail.getFileName(), uploadCode), true);
 
         return Response.status(200).entity("file uploaded: post").build();
     }
@@ -77,7 +77,7 @@ public class ParquetResource {
             return Response.status(200).entity("put test").build();
         }
 
-        ParquetService.getInstance().addParquetFile(new ParquetDTO(fileUploadPath, fileDetail.getFileName(), uploadCode), true);
+        ParquetService.getInstance().addParquetFile(new ParquetDTO(fileUploadPath, fileDetail.getFileName(), uploadCode), false);
 
         return Response.status(200).entity("file uploaded: patch").build();
     }

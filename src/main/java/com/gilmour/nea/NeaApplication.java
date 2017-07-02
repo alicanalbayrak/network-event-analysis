@@ -1,11 +1,15 @@
 package com.gilmour.nea;
 
+import com.gilmour.nea.core.ConnectionSummaryDaoProxy;
 import com.gilmour.nea.core.ProtocolNumberConverter;
+import com.gilmour.nea.db.ConnectionSummaryDAO;
 import com.gilmour.nea.model.ConnectionSummary;
 import com.gilmour.nea.resources.ParquetResource;
+import com.gilmour.nea.service.ParquetService;
 import io.dropwizard.Application;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.hibernate.HibernateBundle;
+import io.dropwizard.hibernate.UnitOfWorkAwareProxyFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -17,7 +21,7 @@ public class NeaApplication extends Application<NeaConfiguration> {
     }
 
 
-    private final HibernateBundle<NeaConfiguration> hibernate = new HibernateBundle<NeaConfiguration>(ConnectionSummary.class) {
+    private final HibernateBundle<NeaConfiguration> hibernateBundle = new HibernateBundle<NeaConfiguration>(ConnectionSummary.class) {
         @Override
         public DataSourceFactory getDataSourceFactory(NeaConfiguration configuration) {
             return configuration.getDataSourceFactory();
@@ -31,7 +35,7 @@ public class NeaApplication extends Application<NeaConfiguration> {
 
     @Override
     public void initialize(final Bootstrap<NeaConfiguration> bootstrap) {
-        bootstrap.addBundle(hibernate);
+        bootstrap.addBundle(hibernateBundle);
 
     }
 
@@ -39,7 +43,12 @@ public class NeaApplication extends Application<NeaConfiguration> {
     public void run(final NeaConfiguration configuration,
                     final Environment environment) {
 
+        final ConnectionSummaryDAO connectionSummaryDAO = new ConnectionSummaryDAO(hibernateBundle.getSessionFactory());
+        ConnectionSummaryDaoProxy connectionSummaryDaoProxy = new UnitOfWorkAwareProxyFactory(hibernateBundle)
+                .create(ConnectionSummaryDaoProxy.class, ConnectionSummaryDAO.class, connectionSummaryDAO);
+
         ProtocolNumberConverter.getInstance().init();
+        ParquetService.getInstance().init(connectionSummaryDaoProxy);
 
         // Enabling MultiPartFeature, injects necessary message body readers, writers for Jersey 2 application.
         environment.jersey().register(MultiPartFeature.class);
