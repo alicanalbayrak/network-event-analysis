@@ -1,14 +1,13 @@
 package com.gilmour.nea.core;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -18,9 +17,9 @@ public class ProtocolNumberConverter {
 
     private static final Logger LOGGER = Logger.getLogger(ProtocolNumberConverter.class.getName());
 
-    //TODO refactor - read from yaml
+    //FIXME refactor - read from yaml
     private static final String fileName = "/iana-protocol-numbers.csv";
-    private static final BiMap<Integer, String> protocolNumberCache = HashBiMap.create();
+    private static final Map<String, String> protocolNumberCache = new HashMap<>();
     private static ProtocolNumberConverter instance = null;
 
 
@@ -32,13 +31,13 @@ public class ProtocolNumberConverter {
 
         Reader in;
         try {
-            in = new FileReader(new File(ProtocolNumberConverter.class.getResource(fileName).getFile()));
+            in = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(fileName)));
             Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
             for (CSVRecord record : records) {
                 System.out.println(record.get("Keyword"));
-                protocolNumberCache.put(Integer.valueOf(record.get("Decimal")), record.get("Keyword"));
+                protocolNumberCache.put(record.get("Decimal"), record.get("Keyword"));
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -56,13 +55,9 @@ public class ProtocolNumberConverter {
         return instance;
     }
 
-    public String decimal2Keyword(int assignedNumberCode){
-        return protocolNumberCache.get(assignedNumberCode);
+    public String decimal2Keyword(int assignedNumberCode) {
+        // TODO exception guard may placed here
+        return protocolNumberCache.get(String.valueOf(assignedNumberCode));
     }
-
-    public int keyword2Decimal(String keyword){
-        return protocolNumberCache.inverse().get(keyword);
-    }
-
 
 }

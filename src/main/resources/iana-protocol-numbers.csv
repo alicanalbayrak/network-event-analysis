@@ -8,7 +8,7 @@ Decimal,Keyword,Protocol,IPv6 Extension Header,Reference
 6,TCP,Transmission Control,,[RFC793]
 7,CBT,CBT,,[Tony_Ballardie]
 8,EGP,Exterior Gateway Protocol,,[RFC888][David_Mills]
-9,IGP,"any private interior gateway             
+9,IGP,"any private interior gateway
 (used by Cisco for their IGRP)",,[Internet_Assigned_Numbers_Authority]
 10,BBN-RCC-MON,BBN RCC Monitoring,,[Steve_Chipman]
 11,NVP-II,Network Voice Protocol,,[RFC741][Steve_Casner]
@@ -73,7 +73,7 @@ Livermore, California, June 1977.][Barry_Howard]"
 53,SWIPE (deprecated),IP with Encryption,,[John_Ioannidis]
 54,NARP,NBMA Address Resolution Protocol,,[RFC1735]
 55,MOBILE,IP Mobility,,[Charlie_Perkins]
-56,TLSP,"Transport Layer Security Protocol        
+56,TLSP,"Transport Layer Security Protocol
 using Kryptonet key management",,[Christer_Oberg]
 57,SKIP,SKIP,,[Tom_Markson]
 58,IPv6-ICMP,ICMP for IPv6,,[RFC-ietf-6man-rfc2460bis-13]

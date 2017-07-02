@@ -1,5 +1,6 @@
 package com.gilmour.nea.resources;
 
+import com.gilmour.nea.core.IPNumberConverter;
 import com.gilmour.nea.core.ProtocolNumberConverter;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
@@ -74,10 +75,14 @@ public class ParquetResource {
             System.err.println("--------");
             for (Schema.Field f : fields) {
                 System.err.println(f.name() + ": " + record.get(f.pos()));
-                // Assigned internet protocol numbers
 
+                if(f.name().equalsIgnoreCase("src_ip")){
+                    String ip = IPNumberConverter.longToIp((long) record.get(f.pos()));
+                    System.out.println(ip);
+                }
+                // Assigned internet protocol numbers
                 if(f.name().equalsIgnoreCase("protocol")){
-                    String abc = ProtocolNumberConverter.getInstance().decimal2Keyword((Integer) record.get(f.pos()));
+                    String abc = ProtocolNumberConverter.getInstance().decimal2Keyword((int) record.get(f.pos()));
                     System.out.println(record.get(f.pos()) + " " + abc);
                 }
             }
