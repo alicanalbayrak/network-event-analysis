@@ -33,7 +33,6 @@ public class ProtocolNumberConverter {
             in = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(fileName)));
             Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
             for (CSVRecord record : records) {
-                System.out.println(record.get("Keyword"));
                 protocolNumberCache.put(record.get("Decimal"), record.get("Keyword"));
             }
         } catch (Exception e) {

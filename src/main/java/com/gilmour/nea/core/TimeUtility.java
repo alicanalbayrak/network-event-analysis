@@ -8,7 +8,7 @@ import java.time.temporal.ChronoUnit;
  */
 public class TimeUtility {
 
-    private static long timestampInHourResolution(long timestamp){
+    public static long timestampInHourResolution(long timestamp){
         Instant instant = Instant.ofEpochMilli(timestamp);
         instant = instant.truncatedTo(ChronoUnit.HOURS);
         return instant.toEpochMilli();

@@ -2,16 +2,20 @@ package com.gilmour.nea.service;
 
 import com.gilmour.nea.core.ConnectionDTO;
 import com.gilmour.nea.core.ParquetDTO;
+import com.gilmour.nea.core.TimeUtility;
 import com.gilmour.nea.db.ConnectionSummaryDAO;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.parquet.avro.AvroParquetReader;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -43,23 +47,47 @@ public class ParquetService {
     }
 
 
-    public void addParquetFile(ParquetDTO parquetDTO) {
+    public void addParquetFile(ParquetDTO parquetDTO, boolean isPatch) {
 
         parquetExecutorService.execute(() -> {
             try {
-                List<ConnectionDTO> connectionDTOList = parseParquetRecords(parquetDTO.getFilePath());
+                Multiset<ConnectionDTO> connectionDTOList = parseParquetRecords(parquetDTO.getFilePath());
+
+                connectionDTOList.elementSet().forEach( e -> {
+                    System.err.println(connectionDTOList.count(e));
+                });
+
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
     }
 
-    private List<ConnectionDTO> parseParquetRecords(String filePath) throws IOException {
+    public void storeParquetFile(InputStream is, String fileUploadPath) throws IOException {
+        try (FileOutputStream out = new FileOutputStream(new File(fileUploadPath))) {
+
+            int read = 0;
+            byte bytes[] = new byte[1024];
+
+            while ((read = is.read(bytes)) != -1) {
+                out.write(bytes, 0, read);
+            }
+            out.flush();
+            out.close();
+
+        } catch (IOException ex) {
+            LOGGER.error(ex.getMessage());
+            throw ex;
+        }
+    }
+
+    private Multiset<ConnectionDTO> parseParquetRecords(String filePath) throws IOException {
 
         AvroParquetReader.Builder<GenericRecord> builder = AvroParquetReader.builder(new org.apache.hadoop.fs.Path(filePath));
         ParquetReader<GenericRecord> reader = builder.build();
 
-        List<ConnectionDTO> connectionDTOList = new ArrayList<>();
+        Multiset<ConnectionDTO> myMultiset = HashMultiset.create();
 
         // FIXME use connection.avsc instead
         GenericRecord record;
@@ -68,12 +96,13 @@ public class ParquetService {
             ConnectionDTO connectionDTO = new ConnectionDTO();
             connectionDTO.setSourceIp((long) record.get("src_ip"));
             connectionDTO.setDestinationIp((long) record.get("dst_ip"));
-            connectionDTO.setTimestamp((long) record.get("time"));
+            // conversion timestamp to hour resolution (cut off)
+            connectionDTO.setTimestamp(TimeUtility.timestampInHourResolution((long) record.get("time")));
             connectionDTO.setProtocol((int) record.get("protocol"));
-            connectionDTOList.add(connectionDTO);
-            System.err.println(connectionDTO);
+
+            myMultiset.add(connectionDTO);
         }
 
-        return connectionDTOList;
+        return myMultiset;
     }
 }

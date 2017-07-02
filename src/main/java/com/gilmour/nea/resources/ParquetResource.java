@@ -2,6 +2,7 @@ package com.gilmour.nea.resources;
 
 import com.gilmour.nea.core.ParquetDTO;
 import com.gilmour.nea.service.ParquetService;
+import io.dropwizard.jersey.PATCH;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
@@ -10,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicLong;
@@ -50,25 +49,38 @@ public class ParquetResource {
         // FIXME
         String fileUploadPath = this.uploadLocation + counter.incrementAndGet() + "_" + fileDetail.getFileName();
 
-        try (FileOutputStream out = new FileOutputStream(new File(fileUploadPath))) {
-
-            int read = 0;
-            byte bytes[] = new byte[1024];
-
-            while ((read = is.read(bytes)) != -1) {
-                out.write(bytes, 0, read);
-            }
-            out.flush();
-            out.close();
-
-        } catch (Exception ex) {
-            LOGGER.error(ex.getMessage());
-            return Response.status(500).build();
+        try{
+            ParquetService.getInstance().storeParquetFile(is,fileUploadPath);
+        }catch (Exception e){
+            return Response.status(200).entity("put test").build();
         }
 
-        ParquetService.getInstance().addParquetFile(new ParquetDTO(fileUploadPath, fileDetail.getFileName(), uploadCode));
+        ParquetService.getInstance().addParquetFile(new ParquetDTO(fileUploadPath, fileDetail.getFileName(), uploadCode), false);
 
-        return Response.status(200).entity("file uploaded").build();
+        return Response.status(200).entity("file uploaded: post").build();
     }
+
+    @PATCH
+    @Path("/upload")
+    @Consumes({MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_JSON})
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response putParquetFile(@FormDataParam("file") InputStream is,
+                                      @FormDataParam("file") FormDataContentDisposition fileDetail,
+                                      @FormDataParam("uploadCode") String uploadCode) throws IOException {
+
+        // FIXME
+        String fileUploadPath = this.uploadLocation + counter.incrementAndGet() + "_" + fileDetail.getFileName();
+
+        try{
+            ParquetService.getInstance().storeParquetFile(is,fileUploadPath);
+        }catch (Exception e){
+            return Response.status(200).entity("put test").build();
+        }
+
+        ParquetService.getInstance().addParquetFile(new ParquetDTO(fileUploadPath, fileDetail.getFileName(), uploadCode), true);
+
+        return Response.status(200).entity("file uploaded: patch").build();
+    }
+
 
 }
