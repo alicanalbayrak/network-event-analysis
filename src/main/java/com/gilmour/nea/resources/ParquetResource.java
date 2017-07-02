@@ -1,11 +1,7 @@
 package com.gilmour.nea.resources;
 
-import com.gilmour.nea.core.IPNumberConverter;
-import com.gilmour.nea.core.ProtocolNumberConverter;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericRecord;
-import org.apache.parquet.avro.AvroParquetReader;
-import org.apache.parquet.hadoop.ParquetReader;
+import com.gilmour.nea.core.ParquetDTO;
+import com.gilmour.nea.service.ParquetService;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
@@ -13,11 +9,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by gilmour on Jul, 2017.
@@ -29,11 +26,13 @@ public class ParquetResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(ParquetResource.class);
 
     private final String uploadLocation;
+    private final AtomicLong counter;
+
 
     public ParquetResource(String uploadLocation) {
         this.uploadLocation = uploadLocation;
+        counter = new AtomicLong();
     }
-
 
     @GET
     public String test() {
@@ -44,14 +43,14 @@ public class ParquetResource {
     @Path("/upload")
     @Consumes({MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_JSON})
     @Produces(MediaType.APPLICATION_JSON)
-    public String uploadParquetFile(@FormDataParam("file") InputStream is,
-                                    @FormDataParam("file") FormDataContentDisposition fileDetail,
-                                    @FormDataParam("uploadCode") String uploadCode) throws IOException {
+    public Response uploadParquetFile(@FormDataParam("file") InputStream is,
+                                      @FormDataParam("file") FormDataContentDisposition fileDetail,
+                                      @FormDataParam("uploadCode") String uploadCode) throws IOException {
 
-        // TODO Refactor
-        String fileUploadPath= this.uploadLocation + fileDetail.getFileName();
+        // FIXME
+        String fileUploadPath = this.uploadLocation + counter.incrementAndGet() + "_" + fileDetail.getFileName();
 
-        try(FileOutputStream out = new FileOutputStream(new File(fileUploadPath))) {
+        try (FileOutputStream out = new FileOutputStream(new File(fileUploadPath))) {
 
             int read = 0;
             byte bytes[] = new byte[1024];
@@ -63,31 +62,13 @@ public class ParquetResource {
             out.close();
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.error(ex.getMessage());
+            return Response.status(500).build();
         }
 
-        AvroParquetReader.Builder<GenericRecord> builder = AvroParquetReader.builder(new org.apache.hadoop.fs.Path(fileUploadPath));
-        ParquetReader<GenericRecord> reader = builder.build();
+        ParquetService.getInstance().addParquetFile(new ParquetDTO(fileUploadPath, fileDetail.getFileName(), uploadCode));
 
-        GenericRecord record;
-        while ((record = reader.read()) != null) {
-            List<Schema.Field> fields = record.getSchema().getFields();
-            System.err.println("--------");
-            for (Schema.Field f : fields) {
-                System.err.println(f.name() + ": " + record.get(f.pos()));
-
-                if(f.name().equalsIgnoreCase("src_ip")){
-                    String ip = IPNumberConverter.longToIp((long) record.get(f.pos()));
-                    System.out.println(ip);
-                }
-                // Assigned internet protocol numbers
-                if(f.name().equalsIgnoreCase("protocol")){
-                    String abc = ProtocolNumberConverter.getInstance().decimal2Keyword((int) record.get(f.pos()));
-                    System.out.println(record.get(f.pos()) + " " + abc);
-                }
-            }
-        }
-        return "File successfully uploaded to : " + fileUploadPath + "\n Name = " + uploadCode;
+        return Response.status(200).entity("file uploaded").build();
     }
 
 }

@@ -24,10 +24,9 @@ public class ProtocolNumberConverter {
 
 
     private ProtocolNumberConverter() {
-        cacheCSV();
     }
 
-    private void cacheCSV() {
+    public void init() {
 
         Reader in;
         try {
