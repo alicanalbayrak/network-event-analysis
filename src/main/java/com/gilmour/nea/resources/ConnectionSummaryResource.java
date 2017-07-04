@@ -2,6 +2,8 @@ package com.gilmour.nea.resources;
 
 import com.gilmour.nea.core.*;
 import com.gilmour.nea.db.ConnectionSummaryDAO;
+import com.gilmour.nea.dto.ConnSumQueryObject;
+import com.gilmour.nea.dto.ConnectionSummaryDTO;
 import com.gilmour.nea.model.ConnectionSummary;
 import io.dropwizard.hibernate.UnitOfWork;
 import org.slf4j.Logger;

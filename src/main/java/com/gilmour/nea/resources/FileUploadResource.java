@@ -1,6 +1,6 @@
 package com.gilmour.nea.resources;
 
-import com.gilmour.nea.core.ParquetDTO;
+import com.gilmour.nea.dto.ParquetDTO;
 import com.gilmour.nea.service.ParquetService;
 import io.dropwizard.jersey.PATCH;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;

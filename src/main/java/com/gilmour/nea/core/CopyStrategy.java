@@ -1,5 +1,6 @@
 package com.gilmour.nea.core;
 
+import com.gilmour.nea.dto.ConnectionDTO;
 import com.gilmour.nea.model.ConnectionSummary;
 
 /**

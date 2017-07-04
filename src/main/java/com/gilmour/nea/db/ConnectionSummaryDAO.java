@@ -1,6 +1,6 @@
 package com.gilmour.nea.db;
 
-import com.gilmour.nea.core.ConnSumQueryObject;
+import com.gilmour.nea.dto.ConnSumQueryObject;
 import com.gilmour.nea.core.IPNumberConverter;
 import com.gilmour.nea.core.ProtocolNumberConverter;
 import com.gilmour.nea.model.ConnectionSummary;
@@ -65,11 +65,11 @@ public class ConnectionSummaryDAO extends AbstractDAO<ConnectionSummary> {
         }
 
         if (connSumQueryObject.getStartInMillis() != -1) {
-            // TODO implement
+            criteriaQuery.where(builder.greaterThanOrEqualTo(connectionSummaryRoot.get("timestamp"), connSumQueryObject.getStartInMillis()));
         }
 
         if (connSumQueryObject.getEndInMillis() != -1) {
-            // TODO implement
+            criteriaQuery.where(builder.lessThanOrEqualTo(connectionSummaryRoot.get("timestamp"), connSumQueryObject.getEndInMillis()));
         }
 
         return list(criteriaQuery);

@@ -1,4 +1,4 @@
-package com.gilmour.nea.core;
+package com.gilmour.nea.dto;
 
 /**
  * Created by gilmour on Jul, 2017.

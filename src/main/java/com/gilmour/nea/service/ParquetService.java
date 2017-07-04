@@ -1,6 +1,8 @@
 package com.gilmour.nea.service;
 
 import com.gilmour.nea.core.*;
+import com.gilmour.nea.dto.ConnectionDTO;
+import com.gilmour.nea.dto.ParquetDTO;
 import com.gilmour.nea.model.ConnectionSummary;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -57,8 +59,6 @@ public class ParquetService {
 
         parquetExecutorService.execute(() -> {
 
-//            Multiset<ConnectionDTO> connectionDTOMultiset = HashMultiset.create();
-
             Map<ConnectionDTO, MutableAggregatorInt> freq = new HashMap<>();
 
             try {
@@ -82,7 +82,7 @@ public class ParquetService {
 
                     existingEntries.forEach(summaryElement -> {
                         ConnectionDTO connectionDTO = new ConnectionDTO();
-                        CopyStrategy.convert(summaryElement, connectionDTO);
+                        CopyStrategy.convert(connectionDTO, summaryElement);
 
                         MutableAggregatorInt aggregate = freq.get(connectionDTO);
                         if (aggregate == null) {
