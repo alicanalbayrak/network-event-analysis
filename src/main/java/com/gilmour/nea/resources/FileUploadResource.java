@@ -18,30 +18,28 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by gilmour on Jul, 2017.
  */
-@Path("/parquet")
+@Path("/file")
 @Produces(MediaType.APPLICATION_JSON)
-public class ParquetResource {
+public class FileUploadResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ParquetResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileUploadResource.class);
 
     private final String uploadLocation;
     private final AtomicLong counter;
 
-
-    public ParquetResource(String uploadLocation) {
+    public FileUploadResource(String uploadLocation) {
         this.uploadLocation = uploadLocation;
         counter = new AtomicLong();
     }
 
     @GET
     public String test() {
-        return "parquet-upload-test";
+        return "parquet-resource-test";
     }
 
     @POST
     @Path("/upload")
     @Consumes({MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_JSON})
-    @Produces(MediaType.APPLICATION_JSON)
     public Response uploadParquetFile(@FormDataParam("file") InputStream is,
                                       @FormDataParam("file") FormDataContentDisposition fileDetail,
                                       @FormDataParam("uploadCode") String uploadCode) throws IOException {
@@ -49,9 +47,10 @@ public class ParquetResource {
         // FIXME
         String fileUploadPath = this.uploadLocation + counter.incrementAndGet() + "_" + fileDetail.getFileName();
 
-        try{
-            ParquetService.getInstance().storeParquetFile(is,fileUploadPath);
-        }catch (Exception e){
+        try {
+            ParquetService.getInstance().storeParquetFile(is, fileUploadPath);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
             return Response.status(200).entity("put test").build();
         }
 
@@ -61,19 +60,19 @@ public class ParquetResource {
     }
 
     @PATCH
-    @Path("/upload")
+    @Path("/uploadParquet")
     @Consumes({MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_JSON})
-    @Produces(MediaType.APPLICATION_JSON)
     public Response putParquetFile(@FormDataParam("file") InputStream is,
-                                      @FormDataParam("file") FormDataContentDisposition fileDetail,
-                                      @FormDataParam("uploadCode") String uploadCode) throws IOException {
+                                   @FormDataParam("file") FormDataContentDisposition fileDetail,
+                                   @FormDataParam("uploadCode") String uploadCode) throws IOException {
 
         // FIXME
         String fileUploadPath = this.uploadLocation + counter.incrementAndGet() + "_" + fileDetail.getFileName();
 
-        try{
-            ParquetService.getInstance().storeParquetFile(is,fileUploadPath);
-        }catch (Exception e){
+        try {
+            ParquetService.getInstance().storeParquetFile(is, fileUploadPath);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
             return Response.status(200).entity("put test").build();
         }
 

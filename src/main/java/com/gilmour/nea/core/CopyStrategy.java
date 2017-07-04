@@ -7,7 +7,18 @@ import com.gilmour.nea.model.ConnectionSummary;
  */
 public class CopyStrategy {
 
-    public static ConnectionSummary connDtoToConnSummary(ConnectionSummary to, ConnectionDTO from){
+    public static ConnectionSummary convert(ConnectionSummary to, ConnectionDTO from){
+
+        to.setSourceIp(from.getSourceIp());
+        to.setDestinationIp(from.getDestinationIp());
+        to.setProtocol(from.getProtocol());
+        to.setTimestamp(from.getTimestamp());
+
+        return to;
+    }
+
+
+    public static ConnectionDTO convert(ConnectionDTO to, ConnectionSummary from){
 
         to.setSourceIp(from.getSourceIp());
         to.setDestinationIp(from.getDestinationIp());

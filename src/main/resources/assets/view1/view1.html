@@ -1,0 +1,50 @@
+<!-- <button ng-click="controlloadConnectionsucts()">Load Products</button> -->
+<br/>
+<!-- <div ng-repeat="product in ViewMoconnectionsucts">
+  {{ product.name }} : {{ product.price }}
+</div> -->
+
+ <form class="form-inline" ng-controller = "myCtrl">
+  <div class="form-group">
+    <label for="inputFile">File input</label>
+    <input type="file" id="inputFile" file-model="myFile">
+  </div>
+  <div class="form-group">
+    <label for="inputUploadCode">Upload code</label>
+    <input ng-model="uploadCode" type="text" class="form-control" id="inputUploadCode" placeholder="Upload code">
+  </div>
+  <button class="btn btn-primary" ng-click="uploadFile()">Upload file</button>
+</form>
+
+<br/>
+<hr>
+
+<div ng-controller="connectionController">
+    <form class="form-inline">
+        <div class="form-group">
+            <input ng-model="searchUploadCodeField" type="search" class="form-control" placeholder="Search by upload code">
+        </div>
+        <button class="btn btn-primary" ng-click="controller.loadConnections()">Search</button>
+    </form>
+    <br/>
+
+    <table class="table table-striped">
+        <tr>
+            <th>Source ip</th>
+            <th>Destination ip</th>
+            <th>Protocol</th>
+            <th>Time Block</th>
+            <th>Event Count</th>
+        </tr>
+        <tr ng-repeat="connection in ViewModel.connections">
+            <td>{{ connection.src_ip }}</td>
+            <td>{{ connection.dst_ip }}</td>
+            <td>{{ connection.protocol }}</td>
+            <td>{{ connection.timeBlock }}</td>
+            <td>{{ connection.eventCount }}</td>
+        </tr>
+    </table>
+</div>
+
+
+<hr>

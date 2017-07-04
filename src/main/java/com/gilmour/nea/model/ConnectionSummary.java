@@ -14,8 +14,13 @@ import javax.validation.constraints.NotNull;
                 @NamedQuery(
                         name = "com.gilmour.nea.model.ConnectionSummary.findAll",
                         query = "SELECT p FROM ConnectionSummary p"
-                )
+                ),
+                @NamedQuery(
+                        name = "com.gilmour.nea.model.ConnectionSummary.getConnectionByUploadCode",
+                        query = "SELECT p FROM ConnectionSummary p WHERE p.uploadCode = :uploadCode"
+                ),
         }
+
 )
 public class ConnectionSummary {
 

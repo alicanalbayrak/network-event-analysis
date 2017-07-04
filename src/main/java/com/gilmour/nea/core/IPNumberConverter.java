@@ -1,5 +1,8 @@
 package com.gilmour.nea.core;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.net.util.SubnetUtils;
+
 /**
  * Created by gilmour on Jul, 2017.
  */
@@ -50,4 +53,8 @@ public class IPNumberConverter {
         return result;
     }
 
+    public static Pair<String, String> getIpBlockFromCidrMask(String cidrNotation) throws IllegalArgumentException{
+        SubnetUtils utils = new SubnetUtils(cidrNotation);
+        return Pair.of(utils.getInfo().getLowAddress(), utils.getInfo().getHighAddress());
+    }
 }

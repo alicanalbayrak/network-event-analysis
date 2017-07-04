@@ -2,8 +2,10 @@ package com.gilmour.nea.core;
 
 import com.gilmour.nea.db.ConnectionSummaryDAO;
 import com.gilmour.nea.model.ConnectionSummary;
-import com.google.common.collect.Multiset;
 import io.dropwizard.hibernate.UnitOfWork;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by gilmour on Jul, 2017.
@@ -17,20 +19,29 @@ public class ConnectionSummaryDaoProxy {
     }
 
     @UnitOfWork
-    public void persistList(Multiset<ConnectionDTO> connectionDTOList, String sourceFile, String uploadCode) {
+    public void persistList(Map<ConnectionDTO, MutableAggregatorInt> freq, String sourceFile, String uploadCode) {
 
-        connectionDTOList.elementSet().forEach(element -> {
+        freq.forEach((dto, aggregatorInt) -> {
             ConnectionSummary connectionSummary = new ConnectionSummary();
 
-            CopyStrategy.connDtoToConnSummary(connectionSummary, element);
-            connectionSummary.setNumberOfEvents(connectionDTOList.count(element));
+            CopyStrategy.convert(connectionSummary, dto);
+            connectionSummary.setNumberOfEvents(aggregatorInt.get());
             connectionSummary.setSourceFile(sourceFile);
             connectionSummary.setUploadCode(uploadCode);
 
             connectionSummaryDAO.create(connectionSummary);
-
         });
+
     }
 
 
+    @UnitOfWork
+    public int deleteByUploadCode(String uploadCode) {
+        return connectionSummaryDAO.deleteByUploadCode(uploadCode);
+    }
+
+    @UnitOfWork
+    public List<ConnectionSummary> getByUploadCode(String uploadCode) {
+        return connectionSummaryDAO.getConnectionByUploadCode(uploadCode);
+    }
 }
